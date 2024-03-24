@@ -1,3 +1,3 @@
 # CTF-Writeups
 
-Writeups from CTF I've participated in.
+Writeups from CTFs I've participated in.
