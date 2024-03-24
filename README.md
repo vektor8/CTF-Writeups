@@ -128,10 +128,63 @@ print('CTF{'+sha256_sum+'}')
 
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/ac5c226e-8170-47a9-a11e-9417e136d422)
 
-## rfc-meta
-
+## pygment
 ### Flag proof
-
+```ctf{2ae4644b1e4cbc1f560c52f3ee0985043d3e0acf0f766851382974646578ec39}```
 ### Summary
-
+Command injection in the highlight function.
 ### Details
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/01a8fa63-af80-445d-a340-ca597e05f71c)
+When first opening the site we are greeted with an error trace. It complains about missing keys `a` and `b` so try them as query params
+
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/6a8f1665-1257-4240-a1cb-681ad43c182c)
+It looks like what we send will be used as parameters for the highlight function.
+
+Dirsearch also reveals interesting information
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/f10c02cf-2b8c-4a40-99a3-3763a52a4b7e)
+Accessing `/composer.lock` we can see exactly what libraries are installed.
+
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/87bc8bcb-cb35-4963-8879-9d14744ab54c)
+Leading us to this github [repo](https://github.com/dedalozzo/pygmentize.git) which has this [issue](https://github.com/dedalozzo/pygmentize/issues/1).
+We try exactly that and after some attempts we manage to get the flag by accessing `/?a=&b=;cat flag.php; <<`
+
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/e6e94201-6a1f-4bcb-a582-384ec9310872)
+
+## something-happened - incomplete
+### Flag proof
+```
+1. Log4j
+2. 198.71.247.91
+```
+### Summary
+Search the kibana logs to answer the question.
+### Details
+We enter kibana and start searching. Upon noticing http traffic, we can filter to see only such trafic using `payload_data : *HTTP*` as filter.
+Now looking through the request the following caught my eye.
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/4791eb38-b186-4f8b-80cc-dce189ab441b)
+This helps us answer the first two questions `Log4j` `198.71.247.91`.
+Unfortunately I was unable to find the third answer during the competition.
+## fake-add
+### Flag proof
+```CTF{th1s_is_ju5T_ADD}```
+### Summary
+Reverse engineer the assembly instruction to compute the flag.
+### Details
+Looking at the decompiled ouput doesn't say anything. However, the assembly instructions is where the real thing happens.
+We see that many values are loaded on the stack in local variables.
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/3375b561-fb4d-42ce-9757-f841d2a58873)
+
+Then pairs of consecutive values are added together.
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/76ab7179-f699-4d88-9bbc-e138b17d4785)
+We write a python script to do the computations and we get the flag.
+```python
+numbers = [0x3c,0x7,0x2a,0x2a,0x20,0x26,0x78,0x3,0x5a,0x1a,0x68,0x0,0x27,0xa,0x64,0xf,0x4b,0x14,0x5f,0xa,0x64,0xf,0x55,0xa,0x55,0x15,0x55,0x20,0x34,0x1,0x2a,0x2a,0x35,0x2a,0x21,0x20,0x21,0x23,0x21,0x23,0x64,0x19]
+print(len(numbers))
+
+res = ""
+for i in range(0, len(numbers), 2):
+    res += chr(numbers[i]+numbers[i+1])
+
+print(res)
+```
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/7554a0b0-e1f5-4f68-9889-446a818ecaec)
