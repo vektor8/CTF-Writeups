@@ -1,4 +1,4 @@
-# UNbreakable Romania 2024
+# UNbreakable Romania 2024 - Individual
 
 Victor-Andrei Moșolea - mvictorandrei@gmail.com - vektor 
 
@@ -27,7 +27,9 @@ Victor-Andrei Moșolea - mvictorandrei@gmail.com - vektor
 The C2 server communicates with it's client using the reason phrase from the HTTP response.
 ### Details
 Inside the network tab when connecting to the given host we can see the redirects with status code 301 followed by a hex string.
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/9bc07f07-8460-4677-a1d1-cc7471a98a0d)
+
 Concatenating all those hex strings and decoding the result outputs the flag
 ```bash
 python3 -c "print(bytes.fromhex('4354467b3562613733623766383330626164633365396433326538356263646363313732626334313761666261626339326561376133343362633362373966643732326534633434637d'))"
@@ -42,7 +44,9 @@ b'CTF{5ba73b7f830badc3e9d32e85bcdcc172bc417afbabc92ea7a343bc3b79fd722e4c44c}'
 Get the TLS certificate from the PCAP file. The certificate uses RSA256 with a large e, thus vulnerable to Wiener attack. Use RsaCtfTool.py to solve for the private key and add it to the pcap to see the actual traffic.
 ### Details
 First export the certificate and save it to a file of your choice.
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/dc1e1939-1805-4eb1-99da-cf884935eafa)
+
 I saved it to `a.cert`
 Use `openssl` to convert it to PEM format
 ```bash
@@ -63,9 +67,11 @@ Use RsaCtfTool with Wiener attack (due to the high value of e it's probable to w
 ```bash
 python3 /opt/tools/RsaCtfTool/RsaCtfTool.py -n 1300556443385702960287370880066951363059458853608419778980399106681258797515744867649068169234104827392051556571142405277681682030539978956790151962476764197038895389999034906026782855543935783433997596921912146618367339288840191094863590166756750397571840198677668908227545077721957613740525469652282292908679 -e 106645361573597107845396067866499068630105849159408665310862014583870062061704662230754284832387896920427209753236862548800746662398609212688373613186979102970308417884832531601035544107102590028211579550508699494971288803583755640940424098301425895738898909222425910339731329121362635050810847489912118168559 --attack wiener --private
 ```
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/f25e2f93-9931-4a85-a8f3-c81732a5c329)
 
-Now we copy the private key to a file and import in wireshark
+Now we copy the private key to a file and import in wireshark.
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/00ec4874-5e06-4e35-98b7-60db465e56f3)
 
 And with the communication decoded we can look in the traffic and find our flag.
@@ -126,13 +132,16 @@ And there we have it
 ### Summary
 We use the same procedure as in wifiland to find the wireless password, and then we look inside the PCAP file for the other information.
 ### Details
-Same as for wifiland we find the password and the SSID doing the following
+Same as for wifiland we find the password and the SSID doing the following:
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/12bafc5c-2e87-4e1f-b57c-589947d4445d)
 
 We know that ESSID is the name of the network so we already have that and the password, we only need the BSSID which is a 48bit value
 
 We filter for our target SSID in wireshark and we find our answer.
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/10997037-7ad0-41d4-8560-e5166a53893b)
+
 Now we just complete the script and get the flag
 ```python
 
@@ -159,17 +168,23 @@ print('CTF{'+sha256_sum+'}')
 ### Summary
 Command injection in the highlight function.
 ### Details
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/01a8fa63-af80-445d-a340-ca597e05f71c)
+
 When first opening the site we are greeted with an error trace. It complains about missing keys `a` and `b` so try them as query params
 
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/6a8f1665-1257-4240-a1cb-681ad43c182c)
+
 It looks like what we send will be used as parameters for the highlight function.
 
 Dirsearch also reveals interesting information
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/f10c02cf-2b8c-4a40-99a3-3763a52a4b7e)
+
 Accessing `/composer.lock` we can see exactly what libraries are installed.
 
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/87bc8bcb-cb35-4963-8879-9d14744ab54c)
+
 Leading us to this github [repo](https://github.com/dedalozzo/pygmentize.git) which has this [issue](https://github.com/dedalozzo/pygmentize/issues/1).
 We try exactly that and after some attempts we manage to get the flag by accessing `/?a=&b=;cat flag.php; <<`
 
@@ -187,14 +202,16 @@ Search the kibana logs to answer the question.
 ### Details
 We enter kibana and start searching. Upon noticing http traffic, we can filter to see only such trafic using `payload_data : *HTTP*` as filter.
 Now looking through the request the following caught my eye.
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/4791eb38-b186-4f8b-80cc-dce189ab441b)
+
 This helps us answer the first two questions `Log4j` `198.71.247.91`.
 Unfortunately I was unable to find the third answer during the competition.
 ## fake-add
 ### Flag proof
 ```CTF{th1s_is_ju5T_ADD}```
 ### Summary
-Reverse engineer the assembly instruction to compute the flag.
+Reverse engineer the assembly instructions to compute the flag.
 ### Details
 Looking at the decompiled ouput doesn't say anything. However, the assembly instructions is where the real thing happens.
 We see that many values are loaded on the stack in local variables.
@@ -216,6 +233,7 @@ for i in range(0, len(numbers), 2):
 
 print(res)
 ```
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/7554a0b0-e1f5-4f68-9889-446a818ecaec)
 
 ## improper-configuration
@@ -225,8 +243,11 @@ print(res)
 Reverse engineer apk with jadx-gui
 ### Details
 Looking inside application we find this interesting string.
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/fe2cde10-cb9a-45f7-a26e-f071d2aa673d)
+
 So we search explicitely for the first part in the whole app and find the flag to be the application name
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/a95d8c55-c316-4f87-8827-6a573fbe9909)
 
 ## you-can-trust-me
@@ -236,12 +257,16 @@ So we search explicitely for the first part in the whole app and find the flag t
 Only JWT payload matters as it seems the signature is not checked, therefore we alter the payload to make ourselves admin then we are asked to provide other fields. We provide the fields and at last we need to bruteforce the last field's value to get the flag.
 ### Details
 When first opening the application we are shown that our cookie doesn't have enough privileges.
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/9112f394-0394-4d8f-8525-deac317224c7)
+
 Dirsearch reveals the existence of `/docs` endpoint
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/73c92058-12cc-45c0-bdb1-8b9d8d3242fe)
-Inside the docs we find the following messagw
+
+Inside the docs we find the following message
 ```Note to self: Admin tokens must have the is_admin key defined otherwise we will know that it is just a normal user.```
-This means that we have to modify the payload to have the is_admin key. When doing that we are told we are missing the flag. So we add that field to the payload as well. After that we are missing the pin. After adding the pin as well we are told it is invalid and we are told as a hint the pin is 4 digits.
+This means that we have to modify the payload to have the is_admin key. When doing that we are told we are missing the flag. So we add that field to the payload as well. After that we are missing the pin. After adding the pin as well we are told it is invalid and as a hint that the pin is 4 digits.
 
 In order to bruteforce the pin I wrote this script:
 ```python
@@ -267,9 +292,9 @@ for i in range(9999, 0, -1):
 ```
 The script attempts all 4 digits pins and sends them both as integers and as strings.
 
-After a while the script is able to retrieve the flag.
-![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/a898ae1d-63f3-4919-ae92-35e73bbd32c6)
+After a while the script is able to retrieve the flag using 7331.
 
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/a898ae1d-63f3-4919-ae92-35e73bbd32c6)
 
 ## easy-hide
 ### Flag proof
@@ -277,26 +302,30 @@ After a while the script is able to retrieve the flag.
 ### Summay
 Binwalk the original file then fix the header of the resulting file.
 ### Details
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/8ea3a116-b065-4f53-9f2f-b82168ec50be)
 
 Binwalk reveals another file called `strange-picture.jpg`. However it doesn't seem to be a jpg since it can't be opened. We try to fix it's magic bytes to try and open it as a jpg and it works, revealing the flag.
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/4d0fab4f-8784-4110-b03e-d5ea9014b242)
-![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/01dee118-1bed-44ae-be3a-d3faecd73214)
 
 ## password-manager-is-a-must
 ### Flag proof
 ```CTF{c112b162e0567cbc5ae20558511ab3932446a708bc40a97e88e3faac7c242423}```
 ### Summary
-Use a tool dump part of the password from the memory dump then with hashcat find the rest.
+Use a tool to dump part of the password from the memory dump then with hashcat find the rest.
 ### Details
 We first look what type of files we have been given
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/182406e8-4836-430a-bd9f-40e61293b95f)
+
 Seeing that we have a Keepass database we search online for password dumpers using the memory dump and we find this (repo)[https://github.com/vdohney/keepass-password-dumper].
 We clone and run the project using
 ```bash
 dotnet run ../File.DMP
 ```
 And the output reveals most of the password
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/62931e65-1eea-4cc9-ae08-2a2dd1b80dd8)
 
 Now we convert the database to a hash for hashcat to use
@@ -309,9 +338,10 @@ hashcat -m 13400 hash_only -a 3 -1 ?l ?1esecretpass -O
 ```
 This does not work so we prepend another character and we get the password.
 ```bash
-hashcat -m 13400 hash_only -a 3 -1 ?l ?1esecretpass -O
+hashcat -m 13400 hash_only -a 3 -1 ?l ?1?1esecretpass -O
 ```
 We use the password `thesecretpass` to open the database and we retrieve the flag.
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/ecd8689b-52c4-43cb-80c8-fe2cc9459e1b)
 
 ## persistent-reccon
@@ -320,9 +350,8 @@ We use the password `thesecretpass` to open the database and we retrieve the fla
 ### Summary
 Google a screenshot of the form to find the default credentials and log in to get the flag.
 ### Details
-Taking a screenshot of the login page and searching it on google leads us to the following (documentation)[https://www.westermo.de/-/media/Files/User-guides/westermo_mg_6640-3202-lynx-xx00.pdf]
+Taking a screenshot of the login page and searching it on google leads us to the following [documentation](https://www.westermo.de/-/media/Files/User-guides/westermo_mg_6640-3202-lynx-xx00.pdf). Inside the documentation we are told to use `admin:westermo` to login, which gives us the flag.
 
-Inside the documentation we are told to use `admin:westermo` to login, which gives us the flag.
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/c3e09bef-3495-4e75-8648-dc33a464f93b)
 
 ## secrets-of-winter
@@ -335,7 +364,7 @@ In the exiftools output we can notice that the `Processing Software` and the `Ar
 
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/7710f7b2-140b-41a5-8feb-6dd5c01fac94)
 
-Using google image search I managed to retrieve the original photo. I used this (tool)[https://www.img2go.com/compare-image] to compare the two and this was the output.
+Using google image search I managed to retrieve the original photo. I used this [tool](https://www.img2go.com/compare-image) to compare the two and this was the output.
 
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/4439aecd-fe3d-4c1b-abea-160b3fb24107)
 
@@ -372,7 +401,9 @@ def file(a,b): pass
 ```
 
 After a while we notice that in the process list we can see the admin user running the include.py script from our own directory.
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/11aaaf1c-398d-45e4-9e61-80ebc111752a)
+
 This must mean that the admin has some job set up to run that script but was unable to because it would error when trying to include the `include_php` file.
 
 This means we can inject whatever python code we want. I modified `include_php.py` to contain:
@@ -423,6 +454,7 @@ echo "aW1wb3J0IGh0dHAuY2xpZW50CmltcG9ydCBzeXMKdXJsID0gImxvY2FsaG9zdDoxMzM3LyIKaW
 ```
 
 We then wait for the admin to run the script and we can use attack.py to execute whatever command we need as admin.
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/f193c139-6562-4438-bbf3-d32a581bda62)
 
 
@@ -433,6 +465,7 @@ We then wait for the admin to run the script and we can use attack.py to execute
 Use cyberchef to find the encodings for each step.
 ### Details
 First it is obvious it is binary encoding. Then Cyberchef starts suggesting operations to add to its recipe and as we listen to it, it puts all pieces together to reveal the flag.
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/5fb23333-a296-4dce-9e8b-bd56bbc0c01b)
 
 ## safe-password
@@ -466,6 +499,7 @@ In main we see that we can provide 24 bytes of input which is then validated to 
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/eda4883f-fa01-4a6f-8460-33ee7c465beb)
 
 Another interesting function is the `win` function. When called with ("Hello", 1337, 0) as params it gives us a shell.
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/a4dc23e3-0f71-47c3-9810-e1310ebb5e1c)
 
 So we need to write code in just 24 bytes to:
@@ -473,6 +507,7 @@ So we need to write code in just 24 bytes to:
 - set rsi to 1337
 - set rdx to 0
 - call win
+
 All this without using any disallowed byte.
 
 Final script:
@@ -508,4 +543,5 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+
 ![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/4cb64d53-33f9-40fa-9dd4-6e8173e3914a)
