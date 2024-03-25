@@ -1,4 +1,4 @@
-![c2577b33-69e2-4dcc-8ddf-2f4372cfd879](https://github.com/vektor8/CTF-Writeups/assets/56222237/e865dec7-f624-4a66-b3dd-31c82e5123a9)# ROCSC 2024
+# ROCSC 2024
 
 Victor-Andrei Moșolea - mvictorandrei@gmail.com - vektor 
 
@@ -648,6 +648,7 @@ Q4. Provide the name of the ransomware used în the attack : waffle
 Analyze kibana logs and answer the questions
 ### Details
 We open up the logs and start looking for the answers. For the first question it is enough to look at the values for the source_ip to see a local address with more than half the traffic which proves to be our answer.
+
 ![d4c44e84-83c7-4f79-b7d6-30b1f38de621](https://github.com/vektor8/CTF-Writeups/assets/56222237/d5633adf-f20a-461e-9f77-cf320c8945b8)
 
 With this in mind we filter for traffic to and from this address and we look for HTTP hoping that we can see some plaintext traffic there.
@@ -835,5 +836,33 @@ Use the debugger to see what strings it expects.
 
 ### Details
 We install and open the main executable from the installed folder in IDA where we find an interesting function
+![243d9089-8c5d-49b4-96dc-462ba347850d](https://github.com/vektor8/CTF-Writeups/assets/56222237/b8a8ca11-b9b5-431f-8da4-e1e81efa4407)
+Here the user input is processed and the three types of key are checked until one is good or all fail.
+Let’s open the executable in the x32 debugger and set a breakpoint to this function.
 
+First we open it and find it’s image base
 
+![3ecbd27d-5f84-4b15-a999-c08cf0e060f4](https://github.com/vektor8/CTF-Writeups/assets/56222237/9ce8fd20-3fad-4572-8196-10fa067bb4c6)
+
+Then we use this image base to rebase the executable in IDA.
+Now rebased we know that this functions is at 0xCC4520 so we breakpoint there
+
+![06ae8b4a-7141-41e0-85f2-84f1eefc8ef3](https://github.com/vektor8/CTF-Writeups/assets/56222237/d26c4e93-b3b1-4692-9d14-93122060d6a8)
+
+![f1bfb555-3ddf-430d-9f8e-7254b634653e](https://github.com/vektor8/CTF-Writeups/assets/56222237/386f85d1-64fb-4bf2-92e1-4aab60b4681a)
+
+There we can even see our inputs on the stack. So we were right, here something happens with our input.
+
+We go in IDA now inside the CHECK function as we called it and look inside. We find a strcmp influencing the return value. This must be the actual check for validity, so we set a breakpoint there. 
+
+![2ccd781f-2ef2-4a79-9fc0-3f1354d74fd6](https://github.com/vektor8/CTF-Writeups/assets/56222237/40320082-eb83-47b1-8205-9a39bd464cc5)
+
+Now at that breakpoint we can see it comparing our input with an actual key. This is only the first however, of the three. Coming back to this breakpoint as the check keeps failing due to our invalid keys reveals all the keys one by one.
+
+![2713f915-5c80-4219-b279-5e3740a3279a](https://github.com/vektor8/CTF-Writeups/assets/56222237/b156b369-d85f-4045-863c-47784ac63a40)
+
+![68a6d04c-0a35-4a7d-8de1-242450acbf59](https://github.com/vektor8/CTF-Writeups/assets/56222237/fc243750-aedd-4108-8fa6-59889d4969c6)
+
+![353cce5d-2e54-46ff-879e-f016ad44d622](https://github.com/vektor8/CTF-Writeups/assets/56222237/715cfaec-b8cd-4a08-b022-4471568856c1)
+
+And done with all three flags.
