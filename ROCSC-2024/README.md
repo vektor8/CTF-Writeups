@@ -2,6 +2,19 @@
 
 Victor-Andrei Moșolea - mvictorandrei@gmail.com - vektor 
 
+- [bin-diving: Misc](#bin-diving)
+- [friendly-colabs: OSINT](#friendly-colabs)
+- [rtfm: Misc](#rtfm)
+- [grocery-list: Web](#grocery-list)
+- [binary-illusions: Reverse Engineering](#binary-illusions)
+- [from-memory: Forensics](#from-memory)
+- [crackinator: Reverse Engineering](#crackinator)
+- [ui-crack: Reverse Engineering](#ui-crack)
+- [special-waffle: Threat hunting](#special-waffle)
+- [android-echoes: Mobile](#android-echoes)
+- [joker-and-batman-story: Misc](#joker-and-batman-story)
+- [cool-upload: Web](#cool-upload)
+
 ## from-memory
 ### Flag proof
 ```
