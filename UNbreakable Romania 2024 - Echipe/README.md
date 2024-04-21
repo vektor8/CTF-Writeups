@@ -13,7 +13,8 @@ java -jar ~/CTF/tools/apktool_2.9.0.jar d wicked-game.apk
 
 In the unpack directory we then find: `res/drawable/graphics.jpg`. Which put through `stegsolve` shows the flag.
 
-![alt text](fig/image.png)
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/485e1289-e39c-40d7-b68c-913405485f00)
+
 
 ## sums-up
 ### Flag proof
@@ -46,13 +47,15 @@ Follow the constraints in order to craft a fitting input.
 ### Details
 We open up the file in IDA and we notice two important functions, one for reading user input, and one for checking it. The first one is the reading part:
 
-![alt text](fig/image-1.png)
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/f8180e88-e5d9-41b7-a85a-1c139174b70e)
+
 
 Notice how the 5th throught 8th inputs are chars and all the others are integers.
 
 Now the checking function:
 
-![alt text](fig/image-2.png)
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/e4a2bf69-2b8c-41ad-9580-595d3b1b6dc1)
+
 
 So the constraints are
 ```
@@ -83,7 +86,8 @@ a10 = 1
 a11 = 1
 ```
 
-![alt text](fig/image-5.png)
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/d4d91fb8-e8fa-4b84-b9f9-e04be9167815)
+
 
 ## just-an-upload
 ### Flag proof
@@ -94,11 +98,13 @@ Find the transfered zip in the HTTP traffic and unpack it to find the flag.
 ### Details
 Inside the traffic we find the following response containing a zip file with a text file inside name `flag.txt`.
 
-![alt text](fig/image-4.png)
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/33efcdec-5386-4758-b53e-f2a6ff898750)
+
 
 We export the zip as hex from wireshark and then decode it into a local file, unzip, and that's it.
 
-![alt text](fig/image-3.png)
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/fbbc8e38-663e-493b-8157-6ccb795f8b66)
+
 
 ## admin-star
 ### Flag proof
@@ -159,7 +165,8 @@ search(START,children)
 
 After the script is done, one must just go back to the swagger ui, get a token, and do another request to `file_navigator` endpoint like this:
 
-![alt text](fig/image-6.png)
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/a6e3f8b4-8fb9-451f-97e1-04f47943f8d2)
+
 
 ## threat-monitoring
 ### Flag proof
@@ -174,15 +181,18 @@ Pretty straight forward, search the kibana logs for the answer to each question.
 
 Using the following filter `payload_data : *Host*` we can easily see all HTTP requests and what Host headers is used. Therefore we find one such request.
 
-![alt text](fig/image-7.png)
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/e9c83c32-f156-4a84-ba7d-6c11095ec0d4)
+
 
 Knowing the compromised host and it's ip we can look for traffic that has HTTP Referer header but that is not directed at it like this:
 
-![alt text](fig/image-8.png)
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/28c7ccac-1f72-43df-8dd8-dfa89f7ee265)
+
 
 And if we expand just the first payload, we see the host where traffic is redirected:
 
-![alt text](fig/image-9.png)
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/809ad334-7f6f-42fa-b8ae-8bd23660095f)
+
 
 For the third question, we just look at the same traffic we used to answer the first question, but we look for destination IP. This IP was also used to find the answer to Q2.
 
@@ -194,7 +204,8 @@ Jinja2 Template Injection.
 ### Details
 The first thing we notice is the Werkzeug header in the HTTP responses. Therefore it is safe to assume we are dealing with a site using templating. We are greeted by a form in which we have to name a payee and a sum. The sum can only be number in the form, however in the URL bar we can set to whatever we want. We find the `sum` parameter to be vulnerable, therefore the following payload: `/pay?beneficiar=&suma={{7*7}}` yields:
 
-![alt text](fig/image-10.png)
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/e296014c-82c1-4715-9fbe-bd2aaf1871cd)
+
 
 With this in mind we just create payload to execute commands.
 
@@ -260,12 +271,14 @@ Use after free. We can free a `ctf` then add the `description`, and the new `des
 
 First let's analyze the binary.
 
-![alt text](fig/image-11.png)
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/d2c25362-83a4-4e71-b025-50ce1fc3dca9)
+
 
 Notice how we are allowed to read more when adding a description, adn how we can never have the abs(no_ctf - no_descriptions) be more than 1.
 
 
-![alt text](fig/image-12.png)
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/717f0036-438b-4e56-9255-a129c909920a)
+
 
 In the rest of the cases we can see that we can only free the most recently added ctf or description, and that to print, we must have at least 1 ctf and 1 description, but we can use whatever index we want. Here is where the use after free comes in.
 Esentially the flow is something like this. Add a ctf, add a description, add a ctf, free it, add a description (this is where the freed ctf will be used). This last description is where we place our payload. We write the string to be "/bin/sh" then we overwrite the function pointer placed at offset 56. We add the first one dummy ctf and one description such that the check for printing won't fail.
@@ -338,7 +351,8 @@ if __name__ == "__main__":
 Write short assembly. Use the GOT to store code such that we bypass the restriction.
 ### Details
 Looking at the binary we see that the GOT is set to be RWX so we can store code there. Two entries are left empty, giving us space for 16 bytes of shellcode. We can also use the exit entry in the GOT to store stuff since it won't be called unless we screw up. I stored "/bin/sh" there. And the code in the two entries i mentioned. We can write byte by byte the all our payload and just call main again. Write one byte, call main, write second byte, call main and so on.
-![alt text](fig/image-13.png)
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/29aa366a-442a-4f46-a1af-a55b4de5b29c)
+
 
 Final script:
 ```python
@@ -405,7 +419,8 @@ Reverse engineer python. Print the expect passphrase.
 
 Renaming just one variable it's very to see that it is compared with the user input. Therefore just running the script does the trick.
 
-![alt text](fig/image-14.png)
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/4584b3e6-6c7a-4cba-961d-53617b442aa0)
+
 
 Resulting text is in binary which we can easily decode with cyberchef.
 
@@ -441,7 +456,8 @@ Based on this [article](https://www.canva.dev/blog/engineering/when-url-parsers-
 ```
 This file unfortunately shows us just a few letters.
 
-![alt text](fig/image-15.png)
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/51f33120-2e9f-4f00-a008-d30d70f4e4cb)
+
 
 In order to address this we just reduce x to move further right.
 
@@ -461,7 +477,7 @@ In order to address this we just reduce x to move further right.
 </svg>
 ```
 
-![alt text](fig/image-16.png)
+![image](https://github.com/vektor8/CTF-Writeups/assets/56222237/675f94d3-b592-4137-9980-f96fa46ee290)
 
 Now, we just need to reduce x several times, until we manage to note down the whole flag.
 
